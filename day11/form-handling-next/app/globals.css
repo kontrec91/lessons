@@ -23,4 +23,36 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  height: 100vh;
+
+}
+
+.formInput {
+  border-radius: 5px;
+  background-color: #392626;
+}
+
+.feedbackForm {
+  display: grid;
+  background: grey;
+  border: 1px solid rgb(75, 38, 38);
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 200px;
+  min-height: 250px;
+  padding: 5px;
+  margin: auto;
+  margin-top: 50vh;
+}
+
+.submitFeedback {
+  background: rgb(75, 38, 38);
+  border-radius: 10px;
+  cursor: pointer
+}
+
+.submitFeedback:hover {
+  background: #484850;
 }

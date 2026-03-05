@@ -36,7 +36,7 @@ export default function RootLayout({
             alignItems: "center",
           }}
         >
-          <Link href="/blogs">All Blogs</Link>
+          <Link href="/form">Send feedback</Link>
           <Link href="/">Back to home page</Link>
         </nav>
         {children}
