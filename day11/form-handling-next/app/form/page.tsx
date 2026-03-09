@@ -2,46 +2,25 @@
 'use client'
 
 import createFeedback from "../actions/actions";
-import { Control, useForm, useFormState } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import "./../globals.css";
 import { useState } from "react";
-
-
-export type resultType = { success: boolean, error: null | string }
-
-export type Inputs = {
-    name: string,
-    email: string,
-    comment: string
-  }
-
-  export const initState: Inputs= {
-    name: '',
-    email: '',
-    comment: ''
-  }
-
-
-
-// const ErrorNotification = ({ control }: {control: Control<Inputs, any, Inputs>}) => {
-//     const {dirtyFields} = useFormState({control});
-//     console.log('dirtyFields', dirtyFields)
-//     return dirtyFields.name?  <p style= {{color: 'red'}}>Name or email isn`t correct</p> : null
-// }
-
+import { initState, Inputs, resultType } from "../types/types";
 
 
 const FeedbackForm = ()=> {
 
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<null | string>(null);
     const [isSuccess, setIsSuccess] = useState(false);
 
-     const { register, handleSubmit, formState: { errors }, reset, control } = useForm<Inputs>({
+     const { register, handleSubmit, reset,  } = useForm<Inputs>({
         defaultValues: initState
      });
 
-
+      
     const onSubmit = async (data: Inputs)=> {
+        setError(null)
+        setIsSuccess(false)
 
         const formData = new FormData();
         formData.append('name', data.name)
@@ -50,59 +29,51 @@ const FeedbackForm = ()=> {
 
         try {
             const result = await createFeedback(formData) as resultType;
-                if (result.success){
-                    setIsSuccess(true);
+                if (result.success) {
+                    setIsSuccess(true)
+                    reset();
+                } else {
+                    setError(result.error || 'Uknown error')
+                    reset();
                 }
-            } catch(error){
-                console.log(error)
-                    // setError(error!.message)
+            } 
+            catch(err){
+                setError('Произошла ошибка сети');
             }
-
-            setError(null)
-            setIsSuccess(false)
        
     }
 
-    return <form className="feedbackForm" action={handleSubmit(onSubmit)}>
-            <h3>Leave a feeback</h3>
-            {/* <input name="email" type="email" className="formInput" required/> */}
-            <input 
-                className="formInput" 
-                placeholder='Enter name'
-                {...register("name", {
-                    required: true
-                })} 
-            />
-            {/* {errors.name && <p>{'Name or email isn`t correct'}</p>} */}
-            {/* <ErrorNotification control={control} />  */}
-            <input 
-                type="email" 
-                className="formInput" 
-                placeholder='Enter email'
-                {...register("email", {
-                    required: true
-                })} 
-            />
-            {/* {errors.email && <p>{'Name or email isn`t correct'}</p>} */}
-            <textarea             
-                className="formInput" 
-                placeholder="Your message"
-                rows={5}
-                {...register("comment", {
-                    required: true
-                })} 
-            />
-{/* 
-            // <textarea 
-            // name="message" 
-            // className="formInput" 
-            // placeholder="Your message"
-            // rows={5}
-            // required
-            // ></textarea> */}
-
-            <button type="submit" className="submitFeedback">Send</button>
-        </form>   
+    return <>
+            <form className="feedbackForm" onSubmit={handleSubmit(onSubmit)}>
+                <h3>Leave a feeback</h3>
+                <input 
+                    className="formInput" 
+                    placeholder='Enter name'
+                    {...register("name", {
+                        required: true
+                    })} 
+                />
+                <input 
+                    type="email" 
+                    className="formInput" 
+                    placeholder='Enter email'
+                    {...register("email", {
+                        required: true
+                    })} 
+                />
+                <textarea             
+                    className="formInput" 
+                    placeholder="Your message"
+                    rows={5}
+                    {...register("comment", {
+                        required: true
+                    })} 
+                />
+                <button type="submit" className="submitFeedback">Send</button>
+            </form>   
+            {isSuccess && <p>Successful</p>}
+            {error && <p>{error}</p>}
+        </>
 }
 
 export default FeedbackForm;
