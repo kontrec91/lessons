@@ -1,8 +1,10 @@
 'use server'
 
- const createFeedback = async (formData: FormData) => {
+import { FeedbackState } from "../types/types"
 
-  console.log(formData)
+ const createFeedback = async ( formData: FormData) => {
+
+  console.log('createFeedback', formData)
 
   const name = formData.get('name')
   const email = formData.get('email')

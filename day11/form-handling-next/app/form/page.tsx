@@ -4,80 +4,134 @@
 import createFeedback from "../actions/actions";
 import { useForm } from "react-hook-form"
 import "./../globals.css";
-import { useState } from "react";
-import { initState, Inputs, resultType } from "../types/types";
+import { useActionState } from "react";
+import { FeedbackState, initState, Inputs, resultType } from "../types/types";
 
 
-const FeedbackForm = ()=> {
+// const FeedbackForm = ()=> {
 
-    const [error, setError] = useState<null | string>(null);
-    const [isSuccess, setIsSuccess] = useState(false);
+//     const [error, setError] = useState<null | string>(null);
+//     const [isSuccess, setIsSuccess] = useState(false);
 
-     const { register, handleSubmit, reset,  } = useForm<Inputs>({
-        defaultValues: initState
-     });
+//      const { register, handleSubmit, reset,  } = useForm<Inputs>({
+//         defaultValues: initState
+//      });
 
       
-    const onSubmit = async (data: Inputs)=> {
-        setError(null)
-        setIsSuccess(false)
+//     const onSubmit = async (data: Inputs)=> {
+//         setError(null)
+//         setIsSuccess(false)
 
-        const formData = new FormData();
-        formData.append('name', data.name)
-        formData.append('email', data.email)
-        formData.append('comment', data.comment)
+//         const formData = new FormData();
+//         formData.append('name', data.name)
+//         formData.append('email', data.email)
+//         formData.append('comment', data.comment)
 
-        try {
-            const result = await createFeedback(formData) as resultType;
-                if (result.success) {
-                    setIsSuccess(true)
-                    reset();
-                } else {
-                    setError(result.error || 'Uknown error')
-                    reset();
-                }
-            } 
-            catch(err){
-                setError('Произошла ошибка сети');
-            }
+//         try {
+//             const result = await createFeedback(formData) as resultType;
+//                 if (result.success) {
+//                     setIsSuccess(true)
+//                     reset();
+//                 } else {
+//                     setError(result.error || 'Uknown error')
+//                     reset();
+//                 }
+//             } 
+//             catch(err){
+//                 setError('Произошла ошибка сети');
+//             }
        
-    }
+//     }
+
+//     return <>
+//             <form className="feedbackForm" onSubmit={handleSubmit(onSubmit)}>
+//                 <h3>Leave a feeback</h3>
+//                 <input 
+//                     className="formInput" 
+//                     placeholder='Enter name'
+//                     {...register("name", {
+//                         required: true
+//                     })} 
+//                 />
+//                 <input 
+//                     type="email" 
+//                     className="formInput" 
+//                     placeholder='Enter email'
+//                     {...register("email", {
+//                         required: true
+//                     })} 
+//                 />
+//                 <textarea             
+//                     className="formInput" 
+//                     placeholder="Your message"
+//                     rows={5}
+//                     {...register("comment", {
+//                         required: true
+//                     })} 
+//                 />
+//                 <button type="submit" className="submitFeedback">Send</button>
+//             </form>   
+//             {isSuccess && <p>Successful</p>}
+//             {error && <p>{error}</p>}
+//         </>
+// }
+
+// export default FeedbackForm;
+
+
+
+ ///////////////////////////// useActionState//////////////////////////////
+const FeedbackForm = ()=> {
+    const initialState: FeedbackState = { 
+        success: false, 
+        error: null, 
+    };
+    const [state, formAction] = useActionState(
+    async (prevState: FeedbackState, formData:FormData): Promise<FeedbackState> => {
+            try {
+                return await createFeedback(formData)
+            } 
+            catch(error){
+                return {success: false, error: 'Network error'}
+            }
+} , initialState )
 
     return <>
-            <form className="feedbackForm" onSubmit={handleSubmit(onSubmit)}>
+            <form className="feedbackForm" action={formAction}>
                 <h3>Leave a feeback</h3>
+                <label htmlFor="name"></label>
                 <input 
                     className="formInput" 
                     placeholder='Enter name'
-                    {...register("name", {
-                        required: true
-                    })} 
+                    name='name'
+                    required             
                 />
+                <label htmlFor="email"></label>
                 <input 
                     type="email" 
-                    className="formInput" 
-                    placeholder='Enter email'
-                    {...register("email", {
-                        required: true
-                    })} 
+                                    name='email'
+                                    className="formInput" 
+                                    placeholder='Enter email'
+                                    required
                 />
-                <textarea             
+                <label htmlFor="comment"></label>
+                <textarea
+                    name='comment'             
                     className="formInput" 
                     placeholder="Your message"
                     rows={5}
-                    {...register("comment", {
-                        required: true
-                    })} 
                 />
                 <button type="submit" className="submitFeedback">Send</button>
+                {state.error && <p style={{ color: 'red' }}>{state.error}</p>}
+                {state.success && <p style={{ color: 'green' }}>✅ Успешно!</p>}
             </form>   
-            {isSuccess && <p>Successful</p>}
-            {error && <p>{error}</p>}
         </>
 }
 
-export default FeedbackForm;
 
+ export default FeedbackForm;
+
+ //////////////////////////////////
 
 
 // import { useActionState, startTransition } from 'react';

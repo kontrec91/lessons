@@ -11,3 +11,9 @@ export type Inputs = {
     email: '',
     comment: ''
   }
+
+
+  export type FeedbackState = {
+    success: boolean;
+    error: string | null;
+  };
